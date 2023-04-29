@@ -51,7 +51,7 @@ Within those parameters, `connectproto` follows semantic versioning.
 
 ## Legal
 
-Offered under the [MIT][license].
+Offered under the [MIT license][license].
 
 [APIv2]: https://blog.golang.org/protobuf-apiv2
 [go-support-policy]: https://golang.org/doc/devel/release#policy
