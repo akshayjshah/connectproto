@@ -12,6 +12,7 @@ permissions:
   contents: read
 jobs:
   ci:
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         go-version: [stable, oldstable]
