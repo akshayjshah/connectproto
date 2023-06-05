@@ -10,7 +10,7 @@ import (
 )
 
 func TestJSONUnmarshal(t *testing.T) {
-	codec := &codec{
+	codec := &jsonCodec{
 		name:      "json",
 		unmarshal: protojson.UnmarshalOptions{DiscardUnknown: true},
 	}
@@ -33,7 +33,7 @@ func TestJSONUnmarshal(t *testing.T) {
 }
 
 func TestJSONMarshal(t *testing.T) {
-	codec := &codec{
+	codec := &jsonCodec{
 		name:    "json",
 		marshal: protojson.MarshalOptions{Multiline: true, Indent: "\t"},
 	}
@@ -57,7 +57,7 @@ func TestJSONMarshal(t *testing.T) {
 }
 
 func TestJSONMetadata(t *testing.T) {
-	codec := &codec{name: "json"}
+	codec := &jsonCodec{name: "json"}
 	attest.Equal(t, codec.Name(), codec.name)
 	attest.False(t, codec.IsBinary())
 }
