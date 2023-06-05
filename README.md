@@ -7,7 +7,7 @@ connectproto
 
 
 `connectproto` allows users of [`connect-go`][connect-go] to customize the
-default JSON codecs.
+default JSON and binary codecs.
 
 ## Installation
 
