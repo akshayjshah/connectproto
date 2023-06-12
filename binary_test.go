@@ -7,6 +7,7 @@ import (
 
 	"go.akshayshah.org/attest"
 	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/testing/protocmp"
 	"google.golang.org/protobuf/types/descriptorpb"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/structpb"
@@ -45,19 +46,16 @@ func TestBinaryMarshal(t *testing.T) {
 	t.Run("unstable", func(t *testing.T) {
 		out, err := codec.Marshal(dict)
 		attest.Ok(t, err)
-		var isUnstable bool
-		for i := 0; i < 100; i++ {
-			again, err := codec.MarshalStable(dict)
-			attest.Ok(t, err)
-			if !bytes.Equal(out, again) {
-				isUnstable = true
-			}
-		}
-		attest.True(t, isUnstable, attest.Sprint("Marshal produced stable output"))
+		roundtrip := &structpb.Struct{}
+		attest.Ok(t, proto.Unmarshal(out, roundtrip))
+		attest.Equal(t, roundtrip, dict, attest.Cmp(protocmp.Transform()))
 	})
 	t.Run("stable", func(t *testing.T) {
 		out, err := codec.MarshalStable(dict)
 		attest.Ok(t, err)
+		roundtrip := &structpb.Struct{}
+		attest.Ok(t, proto.Unmarshal(out, roundtrip))
+		attest.Equal(t, roundtrip, dict, attest.Cmp(protocmp.Transform()))
 		for i := 0; i < 100; i++ {
 			again, err := codec.MarshalStable(dict)
 			attest.Ok(t, err)
