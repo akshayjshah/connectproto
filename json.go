@@ -40,11 +40,7 @@ func (j *jsonCodec) Unmarshal(binary []byte, msg any) error {
 }
 
 func (j *jsonCodec) Marshal(msg any) ([]byte, error) {
-	pm, ok := msg.(proto.Message)
-	if !ok {
-		return nil, errNotProto(msg)
-	}
-	return j.marshal.Marshal(pm)
+	return j.MarshalAppend(nil, msg)
 }
 
 func (j *jsonCodec) MarshalStable(message any) ([]byte, error) {
@@ -61,4 +57,12 @@ func (j *jsonCodec) MarshalStable(message any) ([]byte, error) {
 		return nil, err
 	}
 	return compacted.Bytes(), nil
+}
+
+func (j *jsonCodec) MarshalAppend(dst []byte, msg any) ([]byte, error) {
+	pm, ok := msg.(proto.Message)
+	if !ok {
+		return nil, errNotProto(msg)
+	}
+	return j.marshal.MarshalAppend(dst, pm)
 }

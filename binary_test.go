@@ -62,6 +62,13 @@ func TestBinaryMarshal(t *testing.T) {
 			attest.True(t, bytes.Equal(out, again), attest.Sprint("MarshalStable produced unstable output"))
 		}
 	})
+	t.Run("append", func(t *testing.T) {
+		out, err := codec.MarshalAppend(make([]byte, 0, 128), dict)
+		attest.Ok(t, err)
+		roundtrip := &structpb.Struct{}
+		attest.Ok(t, proto.Unmarshal(out, roundtrip))
+		attest.Equal(t, roundtrip, dict, attest.Cmp(protocmp.Transform()))
+	})
 	t.Run("not protobuf", func(t *testing.T) {
 		_, err := codec.Marshal(struct{}{})
 		attest.Error(t, err)

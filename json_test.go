@@ -48,6 +48,11 @@ func TestJSONMarshal(t *testing.T) {
 		attest.Ok(t, err)
 		attest.Equal(t, string(out), `{"name":"Foo"}`)
 	})
+	t.Run("append", func(t *testing.T) {
+		out, err := codec.MarshalAppend(make([]byte, 0, 100), enum)
+		attest.Ok(t, err)
+		attest.Subsequence(t, string(out), "\n\t")
+	})
 	t.Run("not protobuf", func(t *testing.T) {
 		_, err := codec.Marshal(struct{}{})
 		attest.Error(t, err)
