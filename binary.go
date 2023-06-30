@@ -53,22 +53,26 @@ func (b *binaryCodec) Unmarshal(binary []byte, msg any) error {
 }
 
 func (b *binaryCodec) Marshal(msg any) ([]byte, error) {
-	return b.marshalBinary(msg, false /* stable */)
+	return b.marshalBinary(nil, msg, false /* stable */)
 }
 
 func (b *binaryCodec) MarshalStable(msg any) ([]byte, error) {
-	return b.marshalBinary(msg, true /* stable */)
+	return b.marshalBinary(nil, msg, true /* stable */)
 }
 
-func (b *binaryCodec) marshalBinary(msg any, stable bool) ([]byte, error) {
+func (b *binaryCodec) MarshalAppend(dst []byte, msg any) ([]byte, error) {
+	return b.marshalBinary(dst, msg, false /* stable */)
+}
+
+func (b *binaryCodec) marshalBinary(dst []byte, msg any, stable bool) ([]byte, error) {
 	pm, ok := msg.(proto.Message)
 	if !ok {
 		return nil, errNotProto(msg)
 	}
 	if stable {
-		return b.stable.Marshal(pm)
+		return b.stable.MarshalAppend(dst, pm)
 	}
-	return b.marshal.Marshal(pm)
+	return b.marshal.MarshalAppend(dst, pm)
 }
 
 type vtBinaryCodec struct {
