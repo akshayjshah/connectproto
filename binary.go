@@ -1,7 +1,7 @@
 package connectproto
 
 import (
-	"github.com/bufbuild/connect-go"
+	"connectrpc.com/connect"
 	"google.golang.org/protobuf/proto"
 )
 

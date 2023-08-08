@@ -3,7 +3,7 @@ module go.akshayshah.org/connectproto
 go 1.19
 
 require (
-	github.com/bufbuild/connect-go v1.7.0
+	connectrpc.com/connect v1.11.0
 	go.akshayshah.org/attest v1.0.0
 	google.golang.org/protobuf v1.31.0
 )
