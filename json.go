@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 
 	"connectrpc.com/connect"
 	"google.golang.org/protobuf/encoding/protojson"
@@ -36,7 +37,10 @@ func (j *jsonCodec) Unmarshal(binary []byte, msg any) error {
 	if len(binary) == 0 {
 		return errors.New("zero-length payload is not a valid JSON object")
 	}
-	return j.unmarshal.Unmarshal(binary, pm)
+	if err := j.unmarshal.Unmarshal(binary, pm); err != nil {
+		return fmt.Errorf("unmarshal into %T: %w", pm, err)
+	}
+	return nil
 }
 
 func (j *jsonCodec) Marshal(msg any) ([]byte, error) {

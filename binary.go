@@ -1,6 +1,8 @@
 package connectproto
 
 import (
+	"fmt"
+
 	"connectrpc.com/connect"
 	"google.golang.org/protobuf/proto"
 )
@@ -49,7 +51,10 @@ func (b *binaryCodec) Unmarshal(binary []byte, msg any) error {
 	if !ok {
 		return errNotProto(msg)
 	}
-	return b.unmarshal.Unmarshal(binary, pm)
+	if err := b.unmarshal.Unmarshal(binary, pm); err != nil {
+		return fmt.Errorf("unmarshal into %T: %w", pm, err)
+	}
+	return nil
 }
 
 func (b *binaryCodec) Marshal(msg any) ([]byte, error) {
@@ -85,7 +90,10 @@ func newBinaryVTCodec() *vtBinaryCodec {
 
 func (v *vtBinaryCodec) Unmarshal(binary []byte, msg any) error {
 	if vt, ok := msg.(interface{ UnmarshalVT([]byte) error }); ok {
-		return vt.UnmarshalVT(binary)
+		if err := vt.UnmarshalVT(binary); err != nil {
+			return fmt.Errorf("unmarshal into %T: %w", msg, err)
+		}
+		return nil
 	}
 	return v.binaryCodec.Unmarshal(binary, msg)
 }
