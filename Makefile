@@ -6,8 +6,9 @@ SHELL := bash
 MAKEFLAGS += --warn-undefined-variables
 MAKEFLAGS += --no-builtin-rules
 MAKEFLAGS += --no-print-directory
-GO ?= go
 BIN := .tmp/bin
+export PATH := $(BIN):$(PATH)
+export GOBIN := $(abspath $(BIN))
 
 .PHONY: help
 help: ## Describe useful make targets
@@ -20,21 +21,21 @@ all: ## Build, test, and lint (default)
 
 .PHONY: test
 test: build ## Run unit tests
-	$(GO) test -vet=off -race -cover ./...
+	go test -vet=off -race -cover ./...
 
 .PHONY: build
 build: ## Build all packages
-	$(GO) build ./...
+	go build ./...
 
 .PHONY: lint
 lint: $(BIN)/gofmt $(BIN)/staticcheck ## Lint Go
-	test -z "$$($(BIN)/gofmt -s -l . | tee /dev/stderr)"
-	$(GO) vet ./...
-	$(BIN)/staticcheck ./...
+	test -z "$$(gofmt -s -l . | tee /dev/stderr)"
+	go vet ./...
+	staticcheck ./...
 
 .PHONY: lintfix
 lintfix: $(BIN)/gofmt ## Automatically fix some lint errors
-	$(BIN)/gofmt -s -w .
+	gofmt -s -w .
 
 .PHONY: upgrade
 upgrade: ## Upgrade dependencies
@@ -46,8 +47,8 @@ clean: ## Remove intermediate artifacts
 
 $(BIN)/gofmt:
 	@mkdir -p $(@D)
-	$(GO) build -o $(@) cmd/gofmt
+	go build -o $(@) cmd/gofmt
 
 $(BIN)/staticcheck:
 	@mkdir -p $(@D)
-	GOBIN=$(abspath $(@D)) $(GO) install honnef.co/go/tools/cmd/staticcheck@latest
+	go install honnef.co/go/tools/cmd/staticcheck@latest
