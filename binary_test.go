@@ -8,6 +8,7 @@ import (
 	"go.akshayshah.org/attest"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/testing/protocmp"
+	"google.golang.org/protobuf/testing/protopack"
 	"google.golang.org/protobuf/types/descriptorpb"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/structpb"
@@ -93,6 +94,23 @@ func TestVTUnmarshal(t *testing.T) {
 	attest.Equal(t, vt.t, pb.AsTime())
 	// also ensure codec can unmarshal to non-VT structs
 	attest.Ok(t, codec.Unmarshal(bin, &timestamppb.Timestamp{}))
+}
+
+func TestVTUnmarshalWithFallback(t *testing.T) {
+	codec := newBinaryVTCodecWithFallback(newBinaryCodec(proto.MarshalOptions{}, proto.UnmarshalOptions{DiscardUnknown: true}))
+	pb := timestamppb.Now()
+	// set an unknown field
+	unknownField := protopack.Message{protopack.Tag{Number: 333, Type: protopack.BytesType}, protopack.String("I'm a new field!")}
+	pb.ProtoReflect().SetUnknown(unknownField.Marshal())
+	bin, err := proto.Marshal(pb)
+	attest.Ok(t, err)
+	var vt timestampVT
+	attest.Ok(t, codec.Unmarshal(bin, &vt))
+	attest.Equal(t, vt.t, pb.AsTime())
+	// also ensure codec can unmarshal to non-VT structs
+	ts := &timestamppb.Timestamp{}
+	attest.Ok(t, codec.Unmarshal(bin, ts))
+	attest.Equal(t, len(ts.ProtoReflect().GetUnknown()), 0)
 }
 
 func TestVTMarshal(t *testing.T) {
